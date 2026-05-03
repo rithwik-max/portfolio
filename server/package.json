@@ -4,7 +4,7 @@
   "description": "Full Stack Portfolio Backend",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start":"serve -s build",
     "dev": "nodemon index.js"
   },
   "dependencies": {
