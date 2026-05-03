@@ -17,10 +17,11 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/messages — protected (only logged-in user can view messages)
+// GET /api/messages — protected, only returns messages for logged-in user's inbox
 router.get('/', protect, async (req, res) => {
   try {
-    const messages = await Message.find().sort({ createdAt: -1 });
+    // owner field links messages to a specific user's portfolio
+    const messages = await Message.find({ owner: req.user._id }).sort({ createdAt: -1 });
     res.json({ messages });
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch messages.' });
@@ -30,7 +31,12 @@ router.get('/', protect, async (req, res) => {
 // PATCH /api/messages/:id/read — protected
 router.patch('/:id/read', protect, async (req, res) => {
   try {
-    const msg = await Message.findByIdAndUpdate(req.params.id, { read: true }, { new: true });
+    const msg = await Message.findOneAndUpdate(
+      { _id: req.params.id, owner: req.user._id },
+      { read: true },
+      { new: true }
+    );
+    if (!msg) return res.status(404).json({ message: 'Message not found.' });
     res.json({ message: 'Marked as read', msg });
   } catch (err) {
     res.status(500).json({ message: 'Failed to update message.' });
@@ -40,7 +46,8 @@ router.patch('/:id/read', protect, async (req, res) => {
 // DELETE /api/messages/:id — protected
 router.delete('/:id', protect, async (req, res) => {
   try {
-    await Message.findByIdAndDelete(req.params.id);
+    const msg = await Message.findOneAndDelete({ _id: req.params.id, owner: req.user._id });
+    if (!msg) return res.status(404).json({ message: 'Message not found.' });
     res.json({ message: 'Message deleted.' });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete message.' });

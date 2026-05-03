@@ -1,25 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { useAuth } from '../context/AuthContext';
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { user } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
     api.get('/projects')
       .then(res => setProjects(res.data.projects))
       .catch(() => setError('Failed to load projects.'))
       .finally(() => setLoading(false));
-  }, [user]);
+  }, []);
 
   if (loading) return <div className="page-center"><div className="spinner" /></div>;
   if (error) return <div className="page-center"><p className="error-text">{error}</p></div>;
@@ -34,7 +26,7 @@ export default function Projects() {
 
       {projects.length === 0 ? (
         <div className="empty-state">
-          <p>No projects yet. Add some from your dashboard!</p>
+          <p>No projects yet.</p>
         </div>
       ) : (
         <div className="projects-grid">

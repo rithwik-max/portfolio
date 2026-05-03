@@ -3,10 +3,10 @@ const router = express.Router();
 const Project = require('../models/Project');
 const { protect } = require('../middleware/authMiddleware');
 
-// GET /api/projects — protected, only returns logged-in user's projects
-router.get('/', protect, async (req, res) => {
+// GET /api/projects — PUBLIC, no login needed
+router.get('/', async (req, res) => {
   try {
-    const projects = await Project.find({ owner: req.user._id })
+    const projects = await Project.find()
       .sort({ featured: -1, order: 1, createdAt: -1 });
     res.json({ projects });
   } catch (err) {
@@ -25,7 +25,7 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
-// POST /api/projects — protected, attach owner
+// POST /api/projects — protected
 router.post('/', protect, async (req, res) => {
   try {
     const { title, description, techStack, liveUrl, githubUrl, imageUrl, featured } = req.body;

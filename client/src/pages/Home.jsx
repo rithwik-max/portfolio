@@ -24,49 +24,50 @@ const marqueeItems = [
   'Web Dev'
 ];
 
-function useTyping(words){
-  const [display,setDisplay]=useState('');
-  const [wi,setWi]=useState(0);
-  const [del,setDel]=useState(false);
+function useTyping(words) {
+  const [display, setDisplay] = useState('');
+  const [wi, setWi] = useState(0);
+  const [del, setDel] = useState(false);
 
-  useEffect(()=>{
-    const cur=words[wi%words.length];
+  useEffect(() => {
+    const cur = words[wi % words.length];
     let t;
 
-    if(!del && display===cur){
-      t=setTimeout(()=>setDel(true),1800);
-    }else if(del && display===''){
+    if (!del && display === cur) {
+      t = setTimeout(() => setDel(true), 1800);
+    } else if (del && display === '') {
       setDel(false);
-      setWi(i=>i+1);
-    }else{
-      t=setTimeout(()=>{
+      // Fix: wrap around instead of incrementing forever
+      setWi(i => (i + 1) % words.length);
+    } else {
+      t = setTimeout(() => {
         setDisplay(
           del
-            ? cur.slice(0,display.length-1)
-            : cur.slice(0,display.length+1)
+            ? cur.slice(0, display.length - 1)
+            : cur.slice(0, display.length + 1)
         );
-      },del?40:75);
+      }, del ? 40 : 75);
     }
 
-    return ()=>clearTimeout(t);
-  },[display,del,wi,words]);
+    return () => clearTimeout(t);
+  }, [display, del, wi, words]);
 
   return display;
 }
 
-export default function Home(){
+export default function Home() {
 
   const typed = useTyping(roles);
-  const items = [...marqueeItems,...marqueeItems];
+  const items = [...marqueeItems, ...marqueeItems];
 
-  return(
+  return (
     <main className="home">
 
       {/* HERO */}
       <section className="hero">
         <div className="hero-left">
           <div className="hero-eyebrow">
-            <span className="hero-eyebrow-dot"/>
+            <span className="hero-eyebrow-dot" />
             <span className="hero-eyebrow-text">
               Open to Internships · Hyderabad, IN
             </span>
@@ -102,29 +103,23 @@ export default function Home(){
       </section>
 
 
-      {/* SKILLS BAR SAME AS NAVBAR STYLE */}
+      {/* SKILLS BAR */}
       <section className="section skills-section">
 
         <div className="section-label">Skills</div>
         <h2>What I Work With</h2>
 
         <div className="skills-bar-wrap">
-
           <div className="skills-bar">
-
             <div className="skills-track">
-
-              {items.map((item,i)=>(
+              {items.map((item, i) => (
                 <div key={i} className="skill-nav-item">
                   <span className="skill-star">✦</span>
                   {item}
                 </div>
               ))}
-
             </div>
-
           </div>
-
         </div>
 
       </section>

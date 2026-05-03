@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
@@ -17,10 +18,23 @@ app.use(cors({
 
 app.use(express.json());
 
+/* Rate Limiting — auth and contact form */
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 100000, // 15 minutes
+  max: 10,
+  message: { message: 'Too many attempts. Please try again in 15 minutes.' }
+});
+
+const messageLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  message: { message: 'Too many messages sent. Please try again later.' }
+});
+
 /* Routes */
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/projects', projectRoutes);
-app.use('/api/messages', messageRoutes);
+app.use('/api/messages', messageLimiter, messageRoutes);
 
 /* Health Check */
 app.get('/', (req, res) => {
