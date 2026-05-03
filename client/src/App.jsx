@@ -11,7 +11,7 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
-import NotFound from './pages/NotFound';
+import NotFound from './pages/Notfound';
 import './styles.css';
 
 function App() {
