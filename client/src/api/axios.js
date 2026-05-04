@@ -1,16 +1,31 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  baseURL: import.meta.env.VITE_API_URL || '/api',
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach JWT token to every request automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    // Only redirect to login on 401 for protected routes, not public ones
+    if (err.response?.status === 401) {
+      const url = err.config?.url || '';
+      const isPublicRoute = url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/messages');
+      if (!isPublicRoute) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(err);
+  }
+);
 
 export default api;

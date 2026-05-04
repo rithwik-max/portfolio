@@ -41,7 +41,6 @@ export default function Navbar() {
           ) : (
             <>
               <Link to="/login" className="nav-link">Login</Link>
-              <Link to="/signup" className="nav-cta">Sign Up</Link>
             </>
           )}
         </div>
