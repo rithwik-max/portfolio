@@ -14,7 +14,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    // Only redirect to login on 401 for protected routes, not public ones
     if (err.response?.status === 401) {
       const url = err.config?.url || '';
       const isPublicRoute = url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/messages');
